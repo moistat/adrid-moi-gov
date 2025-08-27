@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+
+    <!--共用-->
+    <property name="Charset" value="UTF-8" />
+    <property name="Format1" value="[%d{yyyy-MM-dd HH:mm:ss}][%p][%t][Line:%L][%c.%M]%m%n" />
+
+    <!--aplog log-->
+    <springProperty scope="context" name="LogsLocation" source="LogsLocation"/>
+
+    <!--usage log-->
+    <springProperty scope="context" name="UsageLogsLocation" source="UsageLogsLocation"/>
+    <property name="log.size" value="1MB"/>
+    <timestamp key="date" datePattern="yyyy-MM-dd"/>
+
+
+    <!--${logging.level.root}-->
+    <springProperty scope="context" name="logging.level.root" source="logging.level.root"/>
+    <!-- aplog output -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${Format1}</pattern>
+            <charset>${Charset}</charset>
+        </encoder>
+    </appender>
+
+
+    <!-- usagelog file output -->
+    <turboFilter class="ch.qos.logback.classic.turbo.MDCFilter">
+        <MDCKey>usage</MDCKey>
+        <Value>v_1</Value>
+        <OnMatch>ACCEPT</OnMatch>
+        <onMismatch>NUTURAL</onMismatch>
+    </turboFilter>
+
+    <appender name="USAGE-LOG"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${UsageLogsLocation}/usageLog.log</file>
+       <!--每日滾動日誌-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${UsageLogsLocation}/usageLog_%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <maxHistory>30</maxHistory>
+        <totalSizeCap>3GB</totalSizeCap>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>
+                %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+
+    <!-- aplog file output -->
+    <appender name="fileout" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LogsLocation}/aplog.log</file>
+        <!--每日滾動日誌-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LogsLocation}/aplog_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${Format1}</pattern>
+            <charset>${Charset}</charset>
+        </encoder>
+    </appender>
+
+
+    <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <appender-ref ref="fileout"/>
+    </appender>
+
+    <!-- 根紀錄器層級 -->
+    <root level="${logging.level.root}">
+        <appender-ref ref="async"/>
+    </root>
+
+    <logger name="com.example" level="${logging.level.root}">
+        <appender-ref ref="stdout" />
+        <appender-ref ref="fileout" />
+    </logger>
+
+    <logger name="UsageLog" level="${logging.level.root}" addtivity="true">
+        <appender-ref ref="USAGE-LOG"></appender-ref>
+    </logger>
+
+    <logger name="ApLog" level="${logging.level.root}" addtivity="true">
+        <appender-ref ref="stdout"></appender-ref>
+    </logger>
+</configuration>

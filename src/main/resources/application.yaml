@@ -1,0 +1,6 @@
+#先不連接資料庫#
+#spring:
+#  autoconfigure:
+#    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+

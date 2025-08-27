@@ -1,0 +1,31 @@
+#本機開發環境
+server:
+  port: 8888
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+  h2:
+    console:
+      enabled: true
+  datasource:
+    jdbc-url: jdbc:h2:file:./h2/testdb
+    username: sa
+    password: 1qaz@WSX
+    driver-class-name: org.h2.Driver
+    hikari:
+      driver-class-name: org.h2.Driver  # Optional if using tracing
+      jdbc-url: jdbc:h2:file:./h2/testdb  # JDBC URL for H2
+      poolName: Hikari
+      auto-commit: false
+
+swagger:
+  baseurl:
+
+LogsLocation: aplog
+UsageLogsLocation: usagelog
+
+security-config-component:
+  content-security-policy: "default-src 'self' ; frame-src 'self' ; script-src 'self' 'unsafe-inline' ; style-src 'self' 'unsafe-inline' data: ; img-src 'self' data: ; font-src 'self' "
+  permissions-policy: "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()"
